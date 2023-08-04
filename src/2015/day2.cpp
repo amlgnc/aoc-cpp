@@ -9,18 +9,39 @@
 
 using namespace std;
 
-// Returns the side with the smallest surface area of the box
+// Return the cubic volume of the box
+int cubicVolume(int l, int w, int h) {
+  return l*w*h;
+}
+
+// Return the smallest perimeter of the box
+int findSmallestPerimeter(int l, int w, int h) {
+  vector<int> perimeters = {2*(l+w), 2*(w+h), 2*(h+l)};
+  return *min_element(perimeters.begin(), perimeters.end());
+}
+
+// Return the total ribbon paper for one box
+int calculateRequiredRibbon(int l, int w, int h) {
+  return findSmallestPerimeter(l, w, h) + cubicVolume(l, w, h);
+}
+
+// Return the side with the smallest surface area of the box
 int findSmallestSurfaceArea(int l, int w, int h) {
   vector<int> surfaces = {l*w, w*h, h*l};
   return *min_element(surfaces.begin(), surfaces.end());
 }
 
-// Returns the surface area of the box
+// Return the surface area of the box
 int calculateBoxSurfaceAera(int l, int w, int h) {
   return 2*l*w + 2*w*h + 2*h*l;
 }
 
-// Returns the box dimensions (l, w, h)
+// Return the total wrapping paper for one box
+int calculateRequiredWrappingPaper(int l, int w, int h) {
+  return calculateBoxSurfaceAera(l, w, h) + findSmallestSurfaceArea(l, w, h);
+}
+
+// Return the box dimensions (l, w, h)
 vector<string> getBoxDimensions(string line) {
   stringstream dimensions(line);
   string segment;
@@ -32,9 +53,10 @@ vector<string> getBoxDimensions(string line) {
   return segDimensions;
 }
 
-// Returns the total number of square feet of wrapping paper to be ordered
-int calculateRequiredWrappingPaper(string input) {
-  int squareFeet = 0;
+// Return the total wrapping paper and ribbon to be ordered
+string readElvesList(string input) {
+  int wrappingPaper = 0;
+  int ribbon = 0;
   ifstream elvesList(input);
   string line;
 
@@ -44,10 +66,11 @@ int calculateRequiredWrappingPaper(string input) {
     int w = stoi(dimensions[1]);
     int h = stoi(dimensions[2]);
 
-    squareFeet += calculateBoxSurfaceAera(l, w, h) + findSmallestSurfaceArea(l, w, h);
+    wrappingPaper += calculateRequiredWrappingPaper(l, w, h);
+    ribbon += calculateRequiredRibbon(l, w, h);
   }
 
-  return squareFeet;
+  return "Wrapping paper : " + to_string(wrappingPaper) + "\nRibbon : " + to_string(ribbon);
 }
 
 // Main function
@@ -56,6 +79,6 @@ int main() {
   string elvesList = "input.txt";
 
   // Result
-  cout << calculateRequiredWrappingPaper(elvesList);
+  cout << readElvesList(elvesList);
   return 0;
 }
