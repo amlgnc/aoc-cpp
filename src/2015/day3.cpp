@@ -70,7 +70,7 @@ int main() {
 
   string text;
   while (input >> text)
-    uniqueVisitedHouses += getUniqueHousesVisited(text, roboSanta);
+    uniqueVisitedHouses = getUniqueHousesVisited(text, roboSanta);
 
   cout << to_string(uniqueVisitedHouses);
   return 0;
