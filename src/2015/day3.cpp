@@ -1,9 +1,9 @@
 // Day 3: Perfectly Spherical Houses in a Vacuum
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include <algorithm>
 
 using namespace std;
@@ -34,18 +34,28 @@ vector<int> travel(vector<int> c, char direction) {
 }
 
 // Returns the number of houses that received at least one gift
-int getUniqueHousesVisited(string directions) {
+int getUniqueHousesVisited(string directions, bool roboSanta) {
   vector<vector<int>> visitedHouses = {{0,0}};
-  vector<int> currentCoordinates = {0,0};
+  vector<int> currentSantaCoordinates = {0,0};
+  vector<int> currentRoboCoordinates = {0,0};
+  bool roboTurn = false;
 
   for (string::size_type i = 0; i < directions.size(); i++) {
-    vector<int> newCoordinates = travel(currentCoordinates, directions[i]);
+    vector<int> newCoordinates;
 
-    if (find(visitedHouses.begin(), visitedHouses.end(), newCoordinates) == visitedHouses.end()) {
-      visitedHouses.push_back(newCoordinates);
+    if (roboSanta && roboTurn) {
+      newCoordinates = travel(currentRoboCoordinates, directions[i]);
+      currentRoboCoordinates = newCoordinates;
+    }
+    else {
+      newCoordinates = travel(currentSantaCoordinates, directions[i]);
+      currentSantaCoordinates = newCoordinates;
     }
 
-    currentCoordinates = newCoordinates;
+    if (find(visitedHouses.begin(), visitedHouses.end(), newCoordinates) == visitedHouses.end())
+      visitedHouses.push_back(newCoordinates);
+
+    roboTurn = !roboTurn;
   }
 
   return visitedHouses.size();
@@ -56,11 +66,11 @@ int main() {
   ifstream input("input.txt");
 
   int uniqueVisitedHouses = 0;
+  bool roboSanta = true;
 
   string text;
-  while (input >> text) {
-    uniqueVisitedHouses += getUniqueHousesVisited(text);
-  }
+  while (input >> text)
+    uniqueVisitedHouses += getUniqueHousesVisited(text, roboSanta);
 
   cout << to_string(uniqueVisitedHouses);
   return 0;
